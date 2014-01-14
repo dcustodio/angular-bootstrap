@@ -1,0 +1,5 @@
+<li class="panel">
+    <a class="accordion-toggle" ng-click="isOpen = !isOpen" accordion-transclude="heading"><i
+            class="{{ iconClass }}"></i> <span class="name">{{ heading }}</span></a>
+    <ul class="panel-collapse" collapse="!isOpen" ng-transclude></ul>
+</li>

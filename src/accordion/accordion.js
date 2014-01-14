@@ -53,6 +53,18 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
   };
 })
 
+// The list-accordion directive simply sets up the directive controller
+// and adds an list-accordion CSS class to itself element.
+.directive('listAccordion', function () {
+  return {
+    restrict:'EA',
+    controller:'AccordionController',
+    transclude: true,
+    replace: false,
+    templateUrl: 'template/accordion/list-accordion.html'
+  };
+})
+
 // The accordion-group directive indicates a block of html that will expand and collapse in an accordion
 .directive('accordionGroup', ['$parse', function($parse) {
   return {
@@ -65,6 +77,52 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
     controller: function() {
       this.setHeading = function(element) {
         this.heading = element;
+      };
+    },
+    link: function(scope, element, attrs, accordionCtrl) {
+      var getIsOpen, setIsOpen;
+
+      accordionCtrl.addGroup(scope);
+
+      scope.isOpen = false;
+      
+      if ( attrs.isOpen ) {
+        getIsOpen = $parse(attrs.isOpen);
+        setIsOpen = getIsOpen.assign;
+
+        scope.$parent.$watch(getIsOpen, function(value) {
+          scope.isOpen = !!value;
+        });
+      }
+
+      scope.$watch('isOpen', function(value) {
+        if ( value ) {
+          accordionCtrl.closeOthers(scope);
+        }
+        if ( setIsOpen ) {
+          setIsOpen(scope.$parent, value);
+        }
+      });
+    }
+  };
+}])
+
+
+// The accordion-group directive indicates a block of html that will expand and collapse in an accordion
+.directive('listAccordionGroup', ['$parse', function($parse) {
+  return {
+    require:'^accordion',         // We need this directive to be inside an accordion
+    restrict:'EA',
+    transclude:true,              // It transcludes the contents of the directive into the template
+    replace: true,                // The element containing the directive will be replaced with the template
+    templateUrl:'template/accordion/list-accordion-group.html',
+    scope:{ heading:'@' , iconClass:'@'},        // Create an isolated scope and interpolate the heading attribute onto this scope
+    controller: function() {
+      this.setHeading = function(element) {
+        this.heading = element;
+      };
+      this.setIconClass = function(element) {
+        this.iconClass = element;
       };
     },
     link: function(scope, element, attrs, accordionCtrl) {
