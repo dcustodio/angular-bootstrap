@@ -111,7 +111,7 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
 // The accordion-group directive indicates a block of html that will expand and collapse in an accordion
 .directive('listAccordionGroup', ['$parse', function($parse) {
   return {
-    require:'^accordion',         // We need this directive to be inside an accordion
+    require:'^listAccordion',         // We need this directive to be inside an accordion
     restrict:'EA',
     transclude:true,              // It transcludes the contents of the directive into the template
     replace: true,                // The element containing the directive will be replaced with the template
@@ -193,4 +193,25 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
       });
     }
   };
+})
+
+//Use in the list-accordion-group template to indicate where you want the heading to be transcluded
+.directive('listAccordionTransclude', function() {
+    return {
+        require: '^listAccordionGroup',
+        link: function(scope, element, attr, controller) {
+            scope.$watch(function() { return controller[attr.listAccordionTransclude]; }, function(heading,iconClass) {
+                if ( heading ) {
+                    element.html('');
+                    element.append(heading);
+                }
+
+                if ( iconClass ) {
+                    attr.html('');
+                    attr.append(iconClass);
+                }
+            });
+        }
+    };
 });
+
